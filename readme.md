@@ -10,6 +10,14 @@ The GPX Tracker plugin for Meshtastic allows you to log location data from your 
 ## Usage
 Simply add the plugin to your Meshtastic setup, and it will automatically handle incoming location data from the network. GPX files will be stored in a directory called `gpx_data`.
 
+```yaml
+community-plugins:
+  gpxtracker:
+    active: true
+    repository: https://github.com/fernandodpr/MMR-GPXTRacker.git
+    tag: main
+```
+
 ## Ethical and Legal Considerations
 Be aware that tracking and logging location data from Meshtastic devices without the explicit consent of all network users may be a violation of privacy laws or ethical guidelines in your jurisdiction. Always ensure that all parties are informed and have given their consent to the use of this plugin.
 
