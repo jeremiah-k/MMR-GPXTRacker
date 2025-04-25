@@ -1,4 +1,4 @@
-from plugins.base_plugin import BasePlugin
+from mmrelay.plugins.base_plugin import BasePlugin
 from datetime import datetime, timezone
 import gpxpy
 import os
@@ -6,8 +6,10 @@ import os
 class Plugin(BasePlugin):
     plugin_name = "gpxtracker"
 
-    
+
     def __init__(self, config_file='config.yaml'):
+        # Set plugin_name before calling super().__init__()
+        self.plugin_name = "gpxtracker"
         super().__init__()
         # Load configuration options
         self.allowed_device_ids = self.config.get('allowed_device_ids', ["*"])
@@ -56,7 +58,7 @@ class Plugin(BasePlugin):
         gpx_file_path = os.path.join(self.gpx_directory, f"{device_id_hex}.gpx")
 
         # Log processed data
-        self.logger.info(f"Processed data from Device={device_id_hex}: Latitude={latitude}, Longitude={longitude}, Altitude={altitude}, track_name={track_name}, Path={gpx_file_path}")
+        self.logger.debug(f"Processed data from Device={device_id_hex}: Latitude={latitude}, Longitude={longitude}, Altitude={altitude}, track_name={track_name}, Path={gpx_file_path}")
 
         # Load or create GPX file
         try:
