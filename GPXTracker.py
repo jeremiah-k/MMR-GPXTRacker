@@ -1,4 +1,4 @@
-from plugins.base_plugin import BasePlugin
+from mmrelay.plugins.base_plugin import BasePlugin
 from datetime import datetime, timezone
 import gpxpy
 import os
@@ -6,23 +6,35 @@ import os
 class Plugin(BasePlugin):
     plugin_name = "gpxtracker"
 
-    
+
     def __init__(self, config_file='config.yaml'):
+        # Set plugin_name before calling super().__init__()
+        self.plugin_name = "gpxtracker"
         super().__init__()
         # Load configuration options
         self.allowed_device_ids = self.config.get('allowed_device_ids', ["*"])
-        self.gpx_directory = self.config.get('gpx_directory', './data/gpx_data')
 
+        # Use the standardized plugin data directory structure
+        # Check for custom directory in config first (for backward compatibility)
+        custom_dir = self.config.get('gpx_directory')
+        if custom_dir:
+            # Expand user directory if needed (e.g., ~/gpx_data -> /home/user/gpx_data)
+            custom_dir = os.path.expanduser(custom_dir)
+            self.logger.info(f"Using custom GPX directory from config: {custom_dir}")
+            self.gpx_directory = custom_dir
+            # Ensure the custom directory exists
+            try:
+                os.makedirs(self.gpx_directory, exist_ok=True)
+            except Exception as e:
+                self.logger.error(f"Failed to create custom GPX directory '{self.gpx_directory}': {e}")
+        else:
+            # Use the standardized plugin data directory with 'gpx_data' subdirectory
+            self.gpx_directory = self.get_plugin_data_dir('gpx_data')
+            self.logger.info(f"Using standardized GPX directory: {self.gpx_directory}")
 
         # Warn if no allowed device IDs are set
         if not self.allowed_device_ids:
             self.logger.warning("[CONFIG_WARNING] Allowed device IDs list is empty. No locations will be logged.")
-
-        # Ensure the GPX directory exists
-        try:
-            os.makedirs(self.gpx_directory, exist_ok=True)
-        except Exception as e:
-            self.logger.error(f"Failed to prepare GPX directory '{self.gpx_directory}': {e}")
 
     async def handle_meshtastic_message(self, packet, formatted_message, longname, meshnet_name):
         """
@@ -55,8 +67,15 @@ class Plugin(BasePlugin):
         # Create GPX file path
         gpx_file_path = os.path.join(self.gpx_directory, f"{device_id_hex}.gpx")
 
+        # Ensure the directory exists (in case it was deleted after initialization)
+        try:
+            os.makedirs(os.path.dirname(gpx_file_path), exist_ok=True)
+        except Exception as e:
+            self.logger.error(f"Failed to ensure GPX directory exists '{os.path.dirname(gpx_file_path)}': {e}")
+            return
+
         # Log processed data
-        self.logger.info(f"Processed data from Device={device_id_hex}: Latitude={latitude}, Longitude={longitude}, Altitude={altitude}, track_name={track_name}, Path={gpx_file_path}")
+        self.logger.debug(f"Processed data from Device={device_id_hex}: Latitude={latitude}, Longitude={longitude}, Altitude={altitude}, track_name={track_name}, Path={gpx_file_path}")
 
         # Load or create GPX file
         try:

@@ -16,7 +16,7 @@ community-plugins:
     active: true
     repository: https://github.com/fernandodpr/MMR-GPXTRacker.git
     tag: main
-    gpx_directory: "./data/gpx_data"
+    gpx_directory: "~/my_gpx_files" # Optional, default is ~/.mmrelay/data/plugins/gpxtracker/gpx_data/
     allowed_device_ids:
       - "fd3e19c2"  # Example (random ID)
       - "*" # To save all location messages that are received.
