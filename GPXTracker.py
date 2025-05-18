@@ -4,12 +4,9 @@ import gpxpy
 import os
 
 class Plugin(BasePlugin):
-    plugin_name = "gpxtracker"
-
+    plugin_name = "gpxtracker"  # Define plugin_name as a class variable
 
     def __init__(self, config_file='config.yaml'):
-        # Set plugin_name before calling super().__init__()
-        self.plugin_name = "gpxtracker"
         super().__init__()
         # Load configuration options
         self.allowed_device_ids = self.config.get('allowed_device_ids', ["*"])
