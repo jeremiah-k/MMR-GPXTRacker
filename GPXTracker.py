@@ -48,7 +48,10 @@ class Plugin(BasePlugin):
             return
 
         # Extract device ID
-        device_id_raw = packet.get("fromId", "")
+        device_id_raw = packet.get("fromId")
+        if not device_id_raw:
+            self.logger.debug("Message missing fromId, ignoring")
+            return
         device_id_hex = device_id_raw.lstrip("!")
 
         # Check if the device is allowed or if wildcard is enabled
