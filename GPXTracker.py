@@ -4,12 +4,9 @@ import gpxpy
 import os
 
 class Plugin(BasePlugin):
-    plugin_name = "gpxtracker"
-
+    plugin_name = "gpxtracker"  # Define plugin_name as a class variable
 
     def __init__(self, config_file='config.yaml'):
-        # Set plugin_name before calling super().__init__()
-        self.plugin_name = "gpxtracker"
         super().__init__()
         # Load configuration options
         self.allowed_device_ids = self.config.get('allowed_device_ids', ["*"])
@@ -48,7 +45,10 @@ class Plugin(BasePlugin):
             return
 
         # Extract device ID
-        device_id_raw = packet.get("fromId", "")
+        device_id_raw = packet.get("fromId")
+        if not device_id_raw:
+            self.logger.debug("Message missing fromId, ignoring")
+            return
         device_id_hex = device_id_raw.lstrip("!")
 
         # Check if the device is allowed or if wildcard is enabled
